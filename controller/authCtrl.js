@@ -58,6 +58,7 @@ const userLoginCtrl = expressAsyncHandler(async (req,res) => {
             firstName:userFound?.firstName,
             lastName:userFound?.lastName,
             email:userFound?.email,
+            isBlocked:userFound?.isBlocked,
             token:generateToken(userFound?._id)
         })
         
@@ -138,10 +139,11 @@ const userProfileCtrl = expressAsyncHandler(async (req, res) => {
 //              Block User 
 //----------------------------------------
   
-const blockUserCtrl = expressAsyncHandler(async (req, res) => {
+const blockOrUnblockUserCtrl = expressAsyncHandler(async (req, res) => {
   const { _id } = req?.user;
   validateMongodbId(_id);
-  const user = await User.findByIdAndUpdate(
+  console.log(req.body)
+  const blockedOrUnblockedUser = await User.findByIdAndUpdate(
     _id,
     {
       isBlocked: req?.body?.isBlocked
@@ -151,7 +153,26 @@ const blockUserCtrl = expressAsyncHandler(async (req, res) => {
       runValidators: true,
     }
   );
-  res.json(user);
+  res.json(blockedOrUnblockedUser);
+});
+  
+
+//----------------------------------------
+//              Block Many User 
+//----------------------------------------
+  
+const blockOrUnblockUsersCtrl = expressAsyncHandler(async (req, res) => {
+  const listOfUsers = req.body.blockOrUnblockUsers
+
+  const answ = await User.updateMany(
+    {id:listOfUsers.$.id},
+    {$set:{
+    isBlocked:listOfUsers.$.isBlocked
+  }})
+
+  console.log(listOfUsers)
+
+  res.json(answ)
 });
 
 module.exports = {
@@ -161,5 +182,6 @@ module.exports = {
     deleteUsersCtrl,
     userProfileCtrl,
     updateUserCtrl,
-    blockUserCtrl
+    blockOrUnblockUserCtrl,
+    blockOrUnblockUsersCtrl
 }

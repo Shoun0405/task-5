@@ -6,7 +6,8 @@ const {
     deleteUsersCtrl,
     userProfileCtrl,
     updateUserCtrl,
-    blockUserCtrl
+    blockOrUnblockUserCtrl,
+    blockOrUnblockUsersCtrl
  } = require('../controller/authCtrl')
 
  const authMiddleware = require('../middlewares/auth/authMiddleware')
@@ -18,7 +19,8 @@ authRouts.post("/login",userLoginCtrl)
 authRouts.get("/allusers",authMiddleware, allUsersCtrl)
 authRouts.get("/profile/:id",authMiddleware, userProfileCtrl)
 authRouts.put("/:id",authMiddleware, updateUserCtrl)
-authRouts.put("/block/:id",authMiddleware, blockUserCtrl)
+authRouts.put("/change-status/:id",authMiddleware, blockOrUnblockUserCtrl)
+authRouts.put("/change-statuses",authMiddleware, blockOrUnblockUsersCtrl)
 authRouts.delete("/:id", deleteUsersCtrl)
 
 module.exports = authRouts
