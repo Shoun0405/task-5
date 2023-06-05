@@ -138,11 +138,12 @@ const userProfileCtrl = expressAsyncHandler(async (req, res) => {
 //----------------------------------------
 //              Block User 
 //----------------------------------------
-  
+
+
 const blockOrUnblockUserCtrl = expressAsyncHandler(async (req, res) => {
   const { _id } = req?.user;
   validateMongodbId(_id);
-  console.log(req.body)
+  console.log(_id)
   const blockedOrUnblockedUser = await User.findByIdAndUpdate(
     _id,
     {
@@ -153,6 +154,7 @@ const blockOrUnblockUserCtrl = expressAsyncHandler(async (req, res) => {
       runValidators: true,
     }
   );
+  console.log("test")
   res.json(blockedOrUnblockedUser);
 });
   
@@ -162,17 +164,45 @@ const blockOrUnblockUserCtrl = expressAsyncHandler(async (req, res) => {
 //----------------------------------------
   
 const blockOrUnblockUsersCtrl = expressAsyncHandler(async (req, res) => {
-  const listOfUsers = req.body.blockOrUnblockUsers
 
-  const answ = await User.updateMany(
-    {id:listOfUsers.$.id},
-    {$set:{
-    isBlocked:listOfUsers.$.isBlocked
-  }})
+  const blockedUsers = req?.body?.blockedUsers
+  const unblockedUsers = req?.body?.unblockedUsers
 
-  console.log(listOfUsers)
+  const blockedLeng = blockedUsers?.length
+  const unblockedLeng = blockedUsers?.length
 
-  res.json(answ)
+  if ( blockedLeng > 0) {
+    
+  await User.find({'_id':{$in:blockedUsers}}).updateMany(
+    {},{
+      $set:{
+        isBlocked:true
+      }
+    }
+  
+  )
+  }
+if (unblockedLeng > 0) {
+  
+  await User.find({'_id':{$in:unblockedUsers}}).updateMany(
+    {},{
+      $set:{
+        isBlocked:false
+      }
+    }
+  
+  )
+}
+
+    const blockedAllUsers = await User.find({'_id':{$in:blockedUsers}})
+    const unblockedAllUsers = await User.find({'_id':{$in:unblockedUsers}})
+
+
+  res.json({
+    blockedAllUsers,
+    unblockedAllUsers,
+  })
+
 });
 
 module.exports = {

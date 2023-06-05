@@ -20,7 +20,7 @@ authRouts.get("/allusers",authMiddleware, allUsersCtrl)
 authRouts.get("/profile/:id",authMiddleware, userProfileCtrl)
 authRouts.put("/:id",authMiddleware, updateUserCtrl)
 authRouts.put("/change-status/:id",authMiddleware, blockOrUnblockUserCtrl)
-authRouts.put("/change-statuses",authMiddleware, blockOrUnblockUsersCtrl)
+authRouts.post("/change-statuses/",authMiddleware, blockOrUnblockUsersCtrl)
 authRouts.delete("/:id", deleteUsersCtrl)
 
 module.exports = authRouts
