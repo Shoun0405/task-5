@@ -77,7 +77,7 @@ const allUsersCtrl = expressAsyncHandler(async (req, res) => {
         const allUsers = await User.find({})
         res.json(allUsers)
     } catch (error) {
-        res.error(error)
+        res.errored(error)
     }
 })
 
@@ -85,7 +85,7 @@ const allUsersCtrl = expressAsyncHandler(async (req, res) => {
 //             Delete Users 
 //----------------------------------------
 
-const deleteUsersCtrl = expressAsyncHandler(async (req, res) => {
+const deleteUserCtrl = expressAsyncHandler(async (req, res) => {
     const { id } = req.params;
     //check if user id is valid
     validateMongodbId(id);
@@ -93,9 +93,23 @@ const deleteUsersCtrl = expressAsyncHandler(async (req, res) => {
       const deletedUser = await User.findByIdAndDelete(id);
       res.json(deletedUser);
     } catch (error) {
-      res.json(error);
+      res.errored(error);
     }
   });
+
+const deleteUsersCtrl = expressAsyncHandler(async (req, res) => {
+  const deleteUsers = req?.body?.deleteUsers
+  try {
+    const findeDelete = await User.find({'_id':{$in:deleteUsers}}).deleteMany({})
+    res.json(findeDelete);
+  } catch (error) {
+    console.log(error)
+    res.errored(error);
+  }
+
+
+
+});
 
 //----------------------------------------
 //              User Profile 
@@ -119,6 +133,8 @@ const userProfileCtrl = expressAsyncHandler(async (req, res) => {
   const updateUserCtrl = expressAsyncHandler(async (req, res) => {
     const { _id } = req?.user;
     validateMongodbId(_id);
+    try {
+      
     const user = await User.findByIdAndUpdate(
       _id,
       {
@@ -132,6 +148,9 @@ const userProfileCtrl = expressAsyncHandler(async (req, res) => {
       }
     );
     res.json(user);
+    } catch (error) {
+      res.json(error)
+    }
   });
   
 
@@ -143,7 +162,8 @@ const userProfileCtrl = expressAsyncHandler(async (req, res) => {
 const blockOrUnblockUserCtrl = expressAsyncHandler(async (req, res) => {
   const { _id } = req?.user;
   validateMongodbId(_id);
-  console.log(_id)
+  try {
+    
   const blockedOrUnblockedUser = await User.findByIdAndUpdate(
     _id,
     {
@@ -154,8 +174,10 @@ const blockOrUnblockUserCtrl = expressAsyncHandler(async (req, res) => {
       runValidators: true,
     }
   );
-  console.log("test")
   res.json(blockedOrUnblockedUser);
+  } catch (error) {
+    res.json(error)
+  }
 });
   
 
@@ -169,46 +191,54 @@ const blockOrUnblockUsersCtrl = expressAsyncHandler(async (req, res) => {
   const unblockedUsers = req?.body?.unblockedUsers
 
   const blockedLeng = blockedUsers?.length
-  const unblockedLeng = blockedUsers?.length
+  const unblockedLeng = unblockedUsers?.length
 
+  try {
+    
   if ( blockedLeng > 0) {
     
-  await User.find({'_id':{$in:blockedUsers}}).updateMany(
-    {},{
-      $set:{
-        isBlocked:true
+    await User.find({'_id':{$in:blockedUsers}}).updateMany(
+      {},{
+        $set:{
+          isBlocked:true
+        }
       }
+    
+    )
     }
-  
-  )
+  if (unblockedLeng > 0) {
+    
+    await User.find({'_id':{$in:unblockedUsers}}).updateMany(
+      {},{
+        $set:{
+          isBlocked:false
+        }
+      }
+    
+    )
   }
-if (unblockedLeng > 0) {
   
-  await User.find({'_id':{$in:unblockedUsers}}).updateMany(
-    {},{
-      $set:{
-        isBlocked:false
-      }
-    }
+      const blockedAllUsers = await User.find({'_id':{$in:blockedUsers}})
+      const unblockedAllUsers = await User.find({'_id':{$in:unblockedUsers}})
   
-  )
-}
-
-    const blockedAllUsers = await User.find({'_id':{$in:blockedUsers}})
-    const unblockedAllUsers = await User.find({'_id':{$in:unblockedUsers}})
-
-
-  res.json({
-    blockedAllUsers,
-    unblockedAllUsers,
-  })
+  
+    res.json({
+      blockedAllUsers,
+      unblockedAllUsers,
+    })
+  } catch (error) {
+    res.json(error)
+  }
 
 });
+
+
 
 module.exports = {
     userRegisterCtrl,
     userLoginCtrl,
     allUsersCtrl,
+    deleteUserCtrl,
     deleteUsersCtrl,
     userProfileCtrl,
     updateUserCtrl,
