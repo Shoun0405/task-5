@@ -32,11 +32,11 @@ const userRegisterCtrl = expressAsyncHandler(async (req,res) => {
           res.json({user,current,message})
   
       } catch (error) {
-        return res.status(400).json(error.errors)
+        return res.json(error.errors)
   
       }
     } else{
-      res.status(400).json({current,message})
+      res.json({current,message})
     }
     
     })
