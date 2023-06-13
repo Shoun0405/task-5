@@ -187,45 +187,25 @@ const blockOrUnblockUserCtrl = expressAsyncHandler(async (req, res) => {
   
 const blockOrUnblockUsersCtrl = expressAsyncHandler(async (req, res) => {
 
-  const blockedUsers = req?.body?.blockedUsers
-  const unblockedUsers = req?.body?.unblockedUsers
-
-  const blockedLeng = blockedUsers?.length
-  const unblockedLeng = unblockedUsers?.length
+  const blockeOrUnblockUsers = req?.body?.blockeOrUnblockUsers
+  const blockeOrUnblock = req?.body?.blockeOrUnblock
+  const blockeOrUnblockLeng = blockeOrUnblockUsers?.length
 
   try {
     
-  if ( blockedLeng > 0) {
     
-    await User.find({'_id':{$in:blockedUsers}}).updateMany(
+    await User.find({'_id':{$in:blockeOrUnblockUsers}}).updateMany(
       {},{
         $set:{
-          isBlocked:true
+          isBlocked:blockeOrUnblock
         }
       }
     
     )
-    }
-  if (unblockedLeng > 0) {
-    
-    await User.find({'_id':{$in:unblockedUsers}}).updateMany(
-      {},{
-        $set:{
-          isBlocked:false
-        }
-      }
-    
-    )
-  }
   
-      const blockedAllUsers = await User.find({'_id':{$in:blockedUsers}})
-      const unblockedAllUsers = await User.find({'_id':{$in:unblockedUsers}})
+      const blockeOrUnblockAllUsers = await User.find({'_id':{$in:blockeOrUnblockUsers}})  
   
-  
-    res.json({
-      blockedAllUsers,
-      unblockedAllUsers,
-    })
+    res.json(blockeOrUnblockAllUsers)
   } catch (error) {
     res.json(error)
   }
